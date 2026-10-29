@@ -1,10 +1,11 @@
 {
- "reto": "Cambia el numero 100 por 300. Que pasa con tu disparo?",
+ "reto": "Cambia DANO por 50. Cuantos disparos necesitas para derribar al enemigo? Despues cambia tu proyectil por otro modelo.",
  "pasos": [
   {
    "i": "hammer",
    "t": "Crea una Tool",
-   "s": "En StarterPack: boton +, Tool. Ponle de nombre: Arma."
+   "s": "En StarterPack: boton +, Tool. Ponle de nombre: Arma.",
+   "parte": "Parte 1: Tu arma"
   },
   {
    "i": "box",
@@ -34,22 +35,23 @@
   {
    "i": "box",
    "t": "Crea el proyectil",
-   "s": "Fuera de la Tool, en Workspace. Un Part, MeshPart o Model, pequeno."
+   "s": "Fuera de la Tool, en Workspace. Un Part, MeshPart o Model, pequeno.",
+   "parte": "Parte 2: Bala, enemigo y mensajero"
   },
   {
    "i": "pencil",
    "t": "Ponle de nombre: Proyectil",
-   "s": "Explorer, clic derecho, Rename."
+   "s": "Explorador, clic derecho, Rename."
   },
   {
-   "i": "lock-open",
-   "t": "Quita Anchored al proyectil",
-   "s": "Apaga Anchored en todas sus piezas."
+   "i": "lock",
+   "t": "PRENDE Anchored",
+   "s": "En todas sus piezas, Anchored prendido. El codigo lo va a mover."
   },
   {
-   "i": "target",
-   "t": "Si es Model: elige PrimaryPart",
-   "s": "En Properties del Model, escoge una pieza como PrimaryPart."
+   "i": "ban",
+   "t": "Apaga CanCollide y CanQuery",
+   "s": "En todas sus piezas. Asi no empuja a nadie ni estorba."
   },
   {
    "i": "folder-input",
@@ -57,36 +59,60 @@
    "s": "Asi queda guardado y no se ve en el juego."
   },
   {
-   "i": "file-code",
-   "t": "Agrega un Script a la Tool",
-   "s": "Clic en Arma (la Tool), boton +, Script. Borra lo que trae."
+   "i": "user",
+   "t": "Crea un enemigo",
+   "s": "Pestana Avatar, Rig Builder, elige cualquiera. Ponlo frente a ti."
   },
   {
-   "i": "keyboard",
-   "t": "Trae el almacen",
-   "s": "Escribe esta linea tu mismo.",
-   "add": [
-    "local ServerStorage = game:GetService(\"ServerStorage\")"
-   ],
-   "why": "Una variable es una cajita con nombre. Esta cajita guarda ServerStorage, donde esta tu proyectil."
+   "i": "radio",
+   "t": "Crea un RemoteEvent",
+   "s": "Clic en Arma (la Tool), boton +, RemoteEvent. Nombre: Disparar. Es un mensajero: tu computadora le avisa al servidor."
+  },
+  {
+   "i": "file-code",
+   "t": "Agrega un LocalScript a la Tool",
+   "s": "Clic en Arma, boton +, LocalScript (no Script). Borra lo que trae.",
+   "parte": "Parte 3: Apuntar con el cursor"
   },
   {
    "i": "keyboard",
    "t": "Guarda tu arma",
-   "s": "Escribe esta linea.",
+   "s": "Escribe esta linea tu mismo.",
    "add": [
     "local arma = script.Parent"
    ],
-   "why": "script.Parent es el papa del script. Como el script esta dentro de la Tool, arma es la Tool."
+   "why": "El LocalScript tambien esta dentro de la Tool.",
+   "script": "LocalScript"
   },
   {
    "i": "keyboard",
-   "t": "Guarda el proyectil",
-   "s": "Escribe esta linea.",
+   "t": "Agarra el mensajero",
+   "s": "Escribe.",
    "add": [
-    "local proyectil = ServerStorage:WaitForChild(\"Proyectil\")"
+    "local evento = arma:WaitForChild(\"Disparar\")"
    ],
-   "why": "Busca en ServerStorage algo llamado Proyectil y espera hasta encontrarlo. Escribe el nombre igualito."
+   "why": "Busca el RemoteEvent que creaste. Escribe el nombre igualito.",
+   "script": "LocalScript"
+  },
+  {
+   "i": "user",
+   "t": "Quien eres tu?",
+   "s": "Escribe.",
+   "add": [
+    "local jugador = game:GetService(\"Players\").LocalPlayer"
+   ],
+   "why": "LocalPlayer eres tu. Un LocalScript solo corre en tu computadora.",
+   "script": "LocalScript"
+  },
+  {
+   "i": "mouse-pointer",
+   "t": "Tu cursor",
+   "s": "Escribe.",
+   "add": [
+    "local mouse = jugador:GetMouse()"
+   ],
+   "why": "mouse sabe en donde esta tu cursor.",
+   "script": "LocalScript"
   },
   {
    "i": "mouse-pointer-click",
@@ -97,92 +123,320 @@
     "arma.Activated:Connect(function()",
     "end)"
    ],
-   "why": "Activated pasa cuando haces clic con el arma. Todo lo que escribas entre estas dos lineas ocurre en cada clic."
+   "why": "Todo lo que escribas entre estas dos lineas ocurre en cada clic.",
+   "script": "LocalScript"
   },
   {
-   "i": "keyboard",
-   "t": "Quien tiene el arma?",
-   "s": "Escribe dentro, con una tecla Tab.",
-   "inside": true,
+   "i": "send",
+   "t": "Manda el mensaje",
+   "s": "Escribe dentro, con Tab.",
    "add": [
-    "\tlocal personaje = arma.Parent"
+    "\tevento:FireServer(mouse.Hit.Position)"
    ],
-   "why": "Cuando equipas el arma, su papa es tu personaje."
+   "why": "Hit.Position es el punto del mundo donde esta tu cursor. FireServer manda ese punto al servidor.",
+   "inside": 1,
+   "script": "LocalScript"
+  },
+  {
+   "i": "file-code",
+   "t": "Agrega un Script a la Tool",
+   "s": "Clic en Arma, boton +, Script (el normal). Borra lo que trae.",
+   "parte": "Parte 4: Disparo y dano"
   },
   {
    "i": "keyboard",
-   "t": "Encuentra el cuerpo",
+   "t": "Trae el almacen",
+   "s": "Escribe esta linea tu mismo.",
+   "add": [
+    "local ServerStorage = game:GetService(\"ServerStorage\")"
+   ],
+   "why": "Una variable es una cajita con nombre. Esta guarda ServerStorage, donde esta tu proyectil.",
+   "script": "Script"
+  },
+  {
+   "i": "keyboard",
+   "t": "Guarda tu arma",
+   "s": "Escribe.",
+   "add": [
+    "local arma = script.Parent"
+   ],
+   "why": "El Script esta dentro de la Tool, asi que arma es la Tool.",
+   "script": "Script"
+  },
+  {
+   "i": "keyboard",
+   "t": "Agarra el mensajero",
+   "s": "Escribe.",
+   "add": [
+    "local evento = arma:WaitForChild(\"Disparar\")"
+   ],
+   "why": "Es el mismo RemoteEvent. Aqui escuchamos el mensaje.",
+   "script": "Script"
+  },
+  {
+   "i": "keyboard",
+   "t": "Guarda el proyectil",
+   "s": "Escribe.",
+   "add": [
+    "local proyectil = ServerStorage:WaitForChild(\"Proyectil\")"
+   ],
+   "why": "Escribe el nombre igualito.",
+   "script": "Script"
+  },
+  {
+   "i": "heart-crack",
+   "t": "Cuanto dano?",
+   "s": "Escribe.",
+   "add": [
+    "local DANO = 20"
+   ],
+   "why": "Un nombre en MAYUSCULAS es un numero que quizas quieras cambiar. Es cuanta vida quita cada disparo.",
+   "script": "Script"
+  },
+  {
+   "i": "inbox",
+   "t": "Cuando llegue el mensaje",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "evento.OnServerEvent:Connect(function(jugador, objetivo)",
+    "end)"
+   ],
+   "why": "Pasa cuando el LocalScript manda el mensaje. jugador es quien disparo y objetivo es el punto de su cursor.",
+   "script": "Script"
+  },
+  {
+   "i": "keyboard",
+   "t": "Tu personaje",
+   "s": "Escribe dentro, con Tab.",
+   "add": [
+    "\tlocal personaje = jugador.Character"
+   ],
+   "why": "Character es el cuerpo del jugador.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "map-pin",
+   "t": "De donde sale la bala",
    "s": "Escribe dentro.",
-   "inside": true,
    "add": [
-    "\tlocal raiz = personaje:FindFirstChild(\"HumanoidRootPart\")"
+    "\tlocal punta = arma.Handle.Position"
    ],
-   "why": "HumanoidRootPart es la pieza central del cuerpo. De ahi sabremos hacia donde miras."
+   "why": "Sale del Handle, tu arma.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "compass",
+   "t": "Hacia donde va",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tlocal direccion = (objetivo - punta).Unit"
+   ],
+   "why": "Objetivo menos punta es una flecha del arma al cursor. Unit la deja de largo 1.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "scan-line",
+   "t": "Reglas del rayo",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tlocal reglas = RaycastParams.new()"
+   ],
+   "why": "Un rayo es una linea invisible que avisa con que choca. Esto son sus reglas.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "keyboard",
+   "t": "Ignora tu cuerpo",
+   "s": "Escribe dentro.",
+   "add": [
+    "\treglas.FilterDescendantsInstances = {personaje}"
+   ],
+   "why": "Asi el rayo no te golpea a ti.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "zap",
+   "t": "Lanza el rayo",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tlocal choque = workspace:Raycast(punta, direccion * 500, reglas)"
+   ],
+   "why": "Lanza el rayo desde el arma, 500 pasos. choque dice con que pego. Si no pego con nada, esta vacio.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "flag",
+   "t": "A donde llega",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tlocal destino = choque and choque.Position or punta + direccion * 500"
+   ],
+   "why": "Si pego, el destino es el punto del choque. Si no, es el final del rayo.",
+   "inside": 1,
+   "script": "Script"
   },
   {
    "i": "copy",
    "t": "Haz una copia",
    "s": "Escribe dentro.",
-   "inside": true,
    "add": [
     "\tlocal copia = proyectil:Clone()"
    ],
-   "why": "Clone hace una copia nueva. Asi puedes disparar muchas veces."
+   "why": "Clone hace una copia nueva para cada disparo.",
+   "inside": 1,
+   "script": "Script"
   },
   {
    "i": "move-up",
-   "t": "Ponla frente a ti",
+   "t": "Ponla en la punta",
    "s": "Escribe dentro.",
-   "inside": true,
    "add": [
-    "\tcopia:PivotTo(raiz.CFrame * CFrame.new(0, 0, -4))"
+    "\tcopia:PivotTo(CFrame.lookAt(punta, destino))"
    ],
-   "why": "Mueve la copia 4 pasos hacia el frente de tu cuerpo. El frente es el numero negativo del ultimo lugar."
+   "why": "La pone en la punta del arma, mirando hacia el destino.",
+   "inside": 1,
+   "script": "Script"
   },
   {
    "i": "globe",
    "t": "Ponla en el juego",
    "s": "Escribe dentro.",
-   "inside": true,
    "add": [
     "\tcopia.Parent = workspace"
    ],
-   "why": "Mientras no este en workspace, nadie la ve. Esta linea la hace aparecer."
+   "why": "Hasta que este en workspace, nadie la ve.",
+   "inside": 1,
+   "script": "Script"
   },
   {
-   "i": "component",
-   "t": "Elige que pieza lanzar",
-   "s": "Escribe dentro.",
-   "inside": true,
+   "i": "repeat",
+   "t": "Repite 20 veces",
+   "s": "Escribe las 2 lineas dentro.",
    "add": [
-    "\tlocal parte = copia:IsA(\"Model\") and copia.PrimaryPart or copia"
+    "\tfor i = 1, 20 do",
+    "\tend"
    ],
-   "why": "Si la copia es un Model usamos su PrimaryPart. Si no, usamos la copia misma."
+   "why": "for repite lo que este entre for y end. Son 20 pasitos de la bala.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "footprints",
+   "t": "Un pasito mas cerca",
+   "s": "Escribe dentro del for, con dos Tab.",
+   "add": [
+    "\t\tlocal posicion = punta:Lerp(destino, i / 20)"
+   ],
+   "why": "Lerp da un punto en el camino. i / 20 empieza chiquito y llega a 1, que es el destino.",
+   "inside": 2,
+   "script": "Script"
   },
   {
    "i": "rocket",
-   "t": "Lanzala",
-   "s": "Escribe dentro.",
-   "inside": true,
+   "t": "Mueve la bala",
+   "s": "Escribe dentro del for.",
    "add": [
-    "\tparte.AssemblyLinearVelocity = raiz.CFrame.LookVector * 100"
+    "\t\tcopia:PivotTo(CFrame.lookAt(posicion, posicion + direccion))"
    ],
-   "why": "LookVector es hacia donde miras. Multiplicar por 100 es la fuerza del disparo."
+   "why": "Pone la bala en ese punto, mirando hacia adelante.",
+   "inside": 2,
+   "script": "Script"
+  },
+  {
+   "i": "timer",
+   "t": "Espera un poquito",
+   "s": "Escribe dentro del for.",
+   "add": [
+    "\t\ttask.wait()"
+   ],
+   "why": "Espera un instante. Sin esto la bala llegaria al final sin que se vea.",
+   "inside": 2,
+   "script": "Script"
   },
   {
    "i": "trash-2",
-   "t": "Borrala despues",
-   "s": "Escribe dentro.",
-   "inside": true,
+   "t": "Borra la bala",
+   "s": "Escribe despues del end del for.",
    "add": [
-    "\tgame.Debris:AddItem(copia, 5)"
+    "\tcopia:Destroy()"
    ],
-   "why": "A los 5 segundos la copia se borra sola, para que no se llene el juego."
+   "why": "Cuando llega, la bala desaparece.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "git-branch",
+   "t": "Choco con algo?",
+   "s": "Escribe las 2 lineas, despues de borrar la bala.",
+   "add": [
+    "\tif choque then",
+    "\tend"
+   ],
+   "why": "if es un 'si'. Solo hacemos dano si el rayo choco con algo.",
+   "inside": 1,
+   "script": "Script"
+  },
+  {
+   "i": "search",
+   "t": "Busca al dueno",
+   "s": "Escribe dentro del if, con dos Tab.",
+   "add": [
+    "\t\tlocal modelo = choque.Instance:FindFirstAncestorOfClass(\"Model\")"
+   ],
+   "why": "La pieza golpeada es parte de un Model, como un personaje. Lo buscamos.",
+   "inside": 2,
+   "script": "Script"
+  },
+  {
+   "i": "heart-pulse",
+   "t": "Busca su vida",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\tlocal humanoide = modelo and modelo:FindFirstChildOfClass(\"Humanoid\")"
+   ],
+   "why": "El Humanoid es quien tiene la vida. 'modelo and' evita errores si no hay modelo.",
+   "inside": 2,
+   "script": "Script"
+  },
+  {
+   "i": "git-branch",
+   "t": "Tiene vida?",
+   "s": "Escribe las 2 lineas dentro del if.",
+   "add": [
+    "\t\tif humanoide then",
+    "\t\tend"
+   ],
+   "why": "Solo se hace dano si lo golpeado tiene vida.",
+   "inside": 2,
+   "script": "Script"
+  },
+  {
+   "i": "swords",
+   "t": "Hazle dano",
+   "s": "Escribe dentro, con tres Tab.",
+   "add": [
+    "\t\t\thumanoide:TakeDamage(DANO)"
+   ],
+   "why": "TakeDamage le quita vida. Cuanta? DANO.",
+   "inside": 3,
+   "script": "Script"
   },
   {
    "i": "play",
    "t": "Prueba tu juego",
-   "s": "Aprieta Play, la tecla 1 para sacar el arma y haz clic."
+   "s": "Aprieta Play, tecla 1 para sacar el arma, apunta con el cursor al enemigo y haz clic. Su vida debe bajar."
+  },
+  {
+   "i": "bug",
+   "t": "Si no funciona",
+   "s": "Pestana Vista, Salida. Lee el mensaje rojo y ensenaselo al profe."
   }
  ]
 }
