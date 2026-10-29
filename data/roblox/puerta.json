@@ -1,0 +1,166 @@
+{
+ "reto": "Cambia el 90 por -90 y el 0.5 por 2. Que cambia?",
+ "pasos": [
+  {
+   "i": "square",
+   "t": "Crea la puerta",
+   "s": "Un Part alto y delgado. Nombre: Puerta."
+  },
+  {
+   "i": "minus",
+   "t": "Crea la bisagra",
+   "s": "Un Part pequeno pegado al borde donde gira. Nombre: Bisagra."
+  },
+  {
+   "i": "lock",
+   "t": "Anchored en los dos",
+   "s": "Prende Anchored en Puerta y en Bisagra."
+  },
+  {
+   "i": "eye-off",
+   "t": "Bisagra invisible",
+   "s": "En Bisagra: Transparency en 1 y CanCollide apagado."
+  },
+  {
+   "i": "group",
+   "t": "Juntalos en un Model",
+   "s": "Selecciona los dos y aprieta Ctrl + G."
+  },
+  {
+   "i": "hand",
+   "t": "Agrega un ProximityPrompt",
+   "s": "Clic en Puerta, boton +, ProximityPrompt."
+  },
+  {
+   "i": "file-code",
+   "t": "Agrega un Script a la Puerta",
+   "s": "Clic en Puerta, boton +, Script. Borra lo que trae."
+  },
+  {
+   "i": "keyboard",
+   "t": "Trae TweenService",
+   "s": "Escribe esta linea tu mismo.",
+   "add": [
+    "local TweenService = game:GetService(\"TweenService\")"
+   ],
+   "why": "TweenService sabe mover cosas suavemente, sin saltos."
+  },
+  {
+   "i": "keyboard",
+   "t": "Guarda la puerta",
+   "s": "Escribe.",
+   "add": [
+    "",
+    "local puerta = script.Parent"
+   ],
+   "why": "El script esta dentro de la Puerta, asi que su papa es la Puerta."
+  },
+  {
+   "i": "keyboard",
+   "t": "Guarda la bisagra",
+   "s": "Escribe.",
+   "add": [
+    "local bisagra = puerta.Parent:WaitForChild(\"Bisagra\")"
+   ],
+   "why": "El papa de la Puerta es el Model. Dentro del Model buscamos la Bisagra."
+  },
+  {
+   "i": "keyboard",
+   "t": "Guarda el boton",
+   "s": "Escribe.",
+   "add": [
+    "local prompt = puerta:WaitForChild(\"ProximityPrompt\")"
+   ],
+   "why": "Asi el script conoce el boton E."
+  },
+  {
+   "i": "toggle-left",
+   "t": "Abierta o cerrada",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "local abierta = false",
+    "local inicio = puerta.CFrame"
+   ],
+   "why": "abierta es verdadero o falso. inicio recuerda donde estaba la puerta cerrada."
+  },
+  {
+   "i": "keyboard",
+   "t": "Un numero que gira",
+   "s": "Escribe.",
+   "add": [
+    "local giro = Instance.new(\"NumberValue\")"
+   ],
+   "why": "Crea un numero que guardara cuantos grados ha girado la puerta."
+  },
+  {
+   "i": "mouse-pointer-click",
+   "t": "Cuando el numero cambie",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "giro.Changed:Connect(function(grados)",
+    "end)"
+   ],
+   "why": "Changed pasa cada vez que el numero cambia. Lo usamos para mover la puerta."
+  },
+  {
+   "i": "rotate-cw",
+   "t": "Gira la puerta",
+   "s": "Escribe las 3 lineas dentro. Usa Tab.",
+   "inside": true,
+   "add": [
+    "\tpuerta.CFrame = bisagra.CFrame",
+    "\t\t* CFrame.Angles(0, math.rad(grados), 0)",
+    "\t\t* bisagra.CFrame:ToObjectSpace(inicio)"
+   ],
+   "why": "Coloca la puerta girada tantos grados alrededor de la bisagra."
+  },
+  {
+   "i": "hand",
+   "t": "Cuando aprietes E",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "prompt.Triggered:Connect(function()",
+    "end)"
+   ],
+   "why": "Triggered pasa cuando alguien aprieta E en el boton."
+  },
+  {
+   "i": "keyboard",
+   "t": "Cambia abierta",
+   "s": "Escribe dentro.",
+   "inside": true,
+   "add": [
+    "\tabierta = not abierta"
+   ],
+   "why": "not da la vuelta: si estaba cerrada ahora esta abierta, y al reves."
+  },
+  {
+   "i": "keyboard",
+   "t": "Elige a donde girar",
+   "s": "Escribe dentro.",
+   "inside": true,
+   "add": [
+    "\tlocal meta = abierta and 90 or 0"
+   ],
+   "why": "Si esta abierta la meta es 90 grados. Si no, es 0."
+  },
+  {
+   "i": "wand-sparkles",
+   "t": "Mueve suave",
+   "s": "Escribe dentro.",
+   "inside": true,
+   "add": [
+    "\tTweenService:Create(giro, TweenInfo.new(0.5), {Value = meta}):Play()"
+   ],
+   "why": "Cambia el numero giro hasta la meta en medio segundo."
+  },
+  {
+   "i": "play",
+   "t": "Prueba tu juego",
+   "s": "Aprieta Play, acercate y aprieta E."
+  }
+ ]
+}
