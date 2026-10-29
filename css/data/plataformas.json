@@ -1,0 +1,36 @@
+[
+  {
+    "id": "roblox",
+    "nombre": "Roblox Studio",
+    "icono": "blocks",
+    "color": "#4cc9f0",
+    "tutoriales": [
+      {
+        "id": "arma",
+        "icono": "crosshair",
+        "titulo": "Arma que dispara",
+        "nivel": "Medio"
+      },
+      {
+        "id": "puerta",
+        "icono": "door-open",
+        "titulo": "Puerta con bisagra",
+        "nivel": "Medio"
+      }
+    ]
+  },
+  {
+    "id": "unity",
+    "nombre": "Unity",
+    "icono": "gamepad-2",
+    "color": "#b8f35c",
+    "tutoriales": []
+  },
+  {
+    "id": "blender",
+    "nombre": "Blender",
+    "icono": "shapes",
+    "color": "#ff9f43",
+    "tutoriales": []
+  }
+]
