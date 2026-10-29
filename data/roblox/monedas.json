@@ -1,0 +1,292 @@
+{
+ "reto": "Escribe una linea nueva: conectar(\"Diamante\", 50). Crea un Diamante con su Hitbox. Cuanto dinero da?",
+ "pasos": [
+  {
+   "i": "file-code",
+   "t": "Crea un Script",
+   "s": "En ServerScriptService: boton +, Script. Borra lo que trae.",
+   "parte": "Parte 1: Tu dinero"
+  },
+  {
+   "i": "users",
+   "t": "Trae a los jugadores",
+   "s": "Escribe esta linea tu mismo.",
+   "add": [
+    "local Players = game:GetService(\"Players\")"
+   ],
+   "why": "Players son todos los jugadores del juego."
+  },
+  {
+   "i": "log-in",
+   "t": "Cuando alguien entre",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "Players.PlayerAdded:Connect(function(jugador)",
+    "end)"
+   ],
+   "why": "Pasa cuando un jugador entra al juego. jugador eres tu."
+  },
+  {
+   "i": "folder-plus",
+   "t": "Crea una carpeta",
+   "s": "Escribe dentro, con Tab.",
+   "add": [
+    "\tlocal stats = Instance.new(\"Folder\")"
+   ],
+   "why": "Instance.new crea algo nuevo. Aqui, una carpeta.",
+   "inside": 1
+  },
+  {
+   "i": "pencil",
+   "t": "Su nombre",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tstats.Name = \"leaderstats\""
+   ],
+   "why": "Se llama leaderstats, igualito. Asi Roblox la muestra en la pantalla.",
+   "inside": 1
+  },
+  {
+   "i": "folder-input",
+   "t": "Dentro del jugador",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tstats.Parent = jugador"
+   ],
+   "why": "Mete la carpeta dentro de ti.",
+   "inside": 1
+  },
+  {
+   "i": "coins",
+   "t": "Crea tu dinero",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tlocal dinero = Instance.new(\"IntValue\")"
+   ],
+   "why": "IntValue es un numero. Aqui vive tu dinero.",
+   "inside": 1
+  },
+  {
+   "i": "pencil",
+   "t": "Su nombre",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tdinero.Name = \"Dinero\""
+   ],
+   "why": "Se llama Dinero.",
+   "inside": 1
+  },
+  {
+   "i": "circle-dot",
+   "t": "Empieza en cero",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tdinero.Value = 0"
+   ],
+   "why": "Empiezas con 0 monedas.",
+   "inside": 1
+  },
+  {
+   "i": "folder-input",
+   "t": "Dentro de la carpeta",
+   "s": "Escribe dentro.",
+   "add": [
+    "\tdinero.Parent = stats"
+   ],
+   "why": "Mete el dinero en la carpeta.",
+   "inside": 1
+  },
+  {
+   "i": "play",
+   "t": "Prueba",
+   "s": "Aprieta Play. Arriba a la derecha debe decir Dinero 0."
+  },
+  {
+   "i": "box",
+   "t": "Haz que sea un Model",
+   "s": "Parte 2. Clic en tu moneda. Si es una sola pieza, aprieta Ctrl + G.",
+   "parte": "Parte 2: La zona para tocar"
+  },
+  {
+   "i": "pencil",
+   "t": "Ponle de nombre: Moneda",
+   "s": "Clic en el Model, clic derecho, Rename. Todas las monedas se llaman igual."
+  },
+  {
+   "i": "square",
+   "t": "Agrega un Part adentro",
+   "s": "Clic en la moneda, boton +, Part. Ponle de nombre: Hitbox."
+  },
+  {
+   "i": "scaling",
+   "t": "Hazlo mas grande que la moneda",
+   "s": "Herramienta Escalar. El Hitbox debe cubrir toda la moneda."
+  },
+  {
+   "i": "eye-off",
+   "t": "Invisible y sin choque",
+   "s": "En Propiedades: Transparency en 1, CanCollide apagado, Anchored prendido."
+  },
+  {
+   "i": "copy",
+   "t": "Copia la moneda",
+   "s": "Haz esto en UNA moneda. Luego Ctrl + C y Ctrl + V para tener muchas. Si ya tenias copias, borralas."
+  },
+  {
+   "i": "package-open",
+   "t": "Haz lo mismo con el cofre",
+   "s": "Model llamado Cofre, con su Part Hitbox adentro. Invisible y sin choque."
+  },
+  {
+   "i": "hand-coins",
+   "t": "Parte 3. Una receta para cobrar",
+   "s": "Ahora vuelve al Script y escribe una receta que sirve para monedas y cofres.",
+   "parte": "Parte 3: Cobrar"
+  },
+  {
+   "i": "chef-hat",
+   "t": "Crea la receta",
+   "s": "Escribe las 3 lineas.",
+   "add": [
+    "",
+    "local function conectar(nombre, cantidad)",
+    "end"
+   ],
+   "why": "Una funcion es una receta. Tu le dices que buscar (nombre) y cuanto dinero dar (cantidad)."
+  },
+  {
+   "i": "search",
+   "t": "Revisa todo",
+   "s": "Escribe las 2 lineas dentro.",
+   "add": [
+    "\tfor _, objeto in workspace:GetDescendants() do",
+    "\tend"
+   ],
+   "why": "Revisa todas las cosas del juego, una por una. objeto es la cosa que esta revisando.",
+   "inside": 1
+  },
+  {
+   "i": "help-circle",
+   "t": "Es lo que busco?",
+   "s": "Escribe las 2 lineas dentro del for.",
+   "add": [
+    "\t\tif objeto.Name == nombre and objeto:FindFirstChild(\"Hitbox\") then",
+    "\t\tend"
+   ],
+   "why": "Si la cosa se llama Moneda (o Cofre) y tiene un Hitbox.",
+   "inside": 2
+  },
+  {
+   "i": "square",
+   "t": "Agarra el Hitbox",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\t\tlocal hitbox = objeto.Hitbox"
+   ],
+   "why": "Guarda el Hitbox en una cajita.",
+   "inside": 3
+  },
+  {
+   "i": "lock-open",
+   "t": "Todavia nadie la agarra",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\t\tlocal usado = false"
+   ],
+   "why": "usado dice si ya la agarraron. false es no.",
+   "inside": 3
+  },
+  {
+   "i": "hand",
+   "t": "Cuando la toquen",
+   "s": "Escribe las 2 lineas dentro del if.",
+   "add": [
+    "\t\t\thitbox.Touched:Connect(function(parte)",
+    "\t\t\tend)"
+   ],
+   "why": "Touched pasa cuando algo toca el Hitbox. parte es lo que lo toco.",
+   "inside": 3
+  },
+  {
+   "i": "user",
+   "t": "Quien fue?",
+   "s": "Escribe dentro.",
+   "add": [
+    "\t\t\t\tlocal jugador = Players:GetPlayerFromCharacter(parte.Parent)"
+   ],
+   "why": "Pregunta: lo que me toco es un jugador?",
+   "inside": 4
+  },
+  {
+   "i": "circle-help",
+   "t": "Es un jugador?",
+   "s": "Escribe las 2 lineas dentro.",
+   "add": [
+    "\t\t\t\tif jugador and not usado then",
+    "\t\t\t\tend"
+   ],
+   "why": "Si es un jugador y todavia nadie la agarro.",
+   "inside": 4
+  },
+  {
+   "i": "lock",
+   "t": "Ya la agarraron",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\t\t\t\tusado = true"
+   ],
+   "why": "Ahora usado es true: ya nadie mas puede agarrarla.",
+   "inside": 5
+  },
+  {
+   "i": "plus",
+   "t": "Dale dinero",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\t\t\t\tjugador.leaderstats.Dinero.Value += cantidad"
+   ],
+   "why": "+= suma cantidad a lo que ya tienes.",
+   "inside": 5
+  },
+  {
+   "i": "trash-2",
+   "t": "Desaparece",
+   "s": "Escribe dentro del if.",
+   "add": [
+    "\t\t\t\t\tobjeto:Destroy()"
+   ],
+   "why": "La moneda desaparece.",
+   "inside": 5
+  },
+  {
+   "i": "circle-dollar-sign",
+   "t": "Usa la receta: monedas",
+   "s": "Escribe al final del Script, sin Tab.",
+   "add": [
+    "",
+    "conectar(\"Moneda\", 2)"
+   ],
+   "why": "Busca todas las Moneda y da 2 de dinero a quien las toque."
+  },
+  {
+   "i": "package-open",
+   "t": "Usa la receta: cofres",
+   "s": "Escribe.",
+   "add": [
+    "conectar(\"Cofre\", 10)"
+   ],
+   "why": "Busca todos los Cofre y da 10 de dinero."
+  },
+  {
+   "i": "play",
+   "t": "Prueba tu juego",
+   "s": "Aprieta Play. Toca una moneda: Dinero sube 2. Toca un cofre: sube 10."
+  },
+  {
+   "i": "bug",
+   "t": "Si no funciona",
+   "s": "Revisa que se llamen igualito: Moneda, Cofre y Hitbox. Mira la ventana Salida (menu Vista) y busca el mensaje rojo."
+  }
+ ]
+}
