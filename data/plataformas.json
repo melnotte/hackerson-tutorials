@@ -16,6 +16,12 @@
         "icono": "door-open",
         "titulo": "Puerta con bisagra",
         "nivel": "Medio"
+      },
+      {
+        "id": "monedas",
+        "icono": "coins",
+        "titulo": "Recolectar monedas",
+        "nivel": "Fácil"
       }
     ]
   },
