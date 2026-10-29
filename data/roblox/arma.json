@@ -2,9 +2,39 @@
  "reto": "Cambia el numero 100 por 300. Que pasa con tu disparo?",
  "pasos": [
   {
+   "i": "hammer",
+   "t": "Crea una Tool",
+   "s": "En StarterPack: boton +, Tool. Ponle de nombre: Arma."
+  },
+  {
+   "i": "box",
+   "t": "Agrega el Handle",
+   "s": "Dentro de la Tool: boton +, Part. Su nombre debe ser EXACTO: Handle. Esta pieza es tu arma."
+  },
+  {
+   "i": "palette",
+   "t": "Dale forma de arma",
+   "s": "Hazla alargada. Cambia Size y Color. Tambien puedes usar un MeshPart."
+  },
+  {
+   "i": "lock-open",
+   "t": "Quita Anchored",
+   "s": "En Properties, apaga Anchored en el Handle y en cualquier pieza extra."
+  },
+  {
+   "i": "link",
+   "t": "Opcional: mas piezas",
+   "s": "En cada pieza extra agrega un WeldConstraint. Part0 = Handle, Part1 = esa pieza."
+  },
+  {
+   "i": "hand",
+   "t": "Prueba tu arma",
+   "s": "Aprieta Play y la tecla 1. Debes ver el arma en tu mano. Si se ve de lado, cambia Grip Orientation en Properties de la Tool."
+  },
+  {
    "i": "box",
    "t": "Crea el proyectil",
-   "s": "Puede ser un Part, un MeshPart o un Model. Hazlo pequeno."
+   "s": "Fuera de la Tool, en Workspace. Un Part, MeshPart o Model, pequeno."
   },
   {
    "i": "pencil",
@@ -13,8 +43,8 @@
   },
   {
    "i": "lock-open",
-   "t": "Quita Anchored",
-   "s": "En Properties, apaga Anchored en todas sus piezas."
+   "t": "Quita Anchored al proyectil",
+   "s": "Apaga Anchored en todas sus piezas."
   },
   {
    "i": "target",
@@ -24,17 +54,12 @@
   {
    "i": "folder-input",
    "t": "Arrastralo a ServerStorage",
-   "s": "Asi queda guardado y no se ve."
-  },
-  {
-   "i": "hammer",
-   "t": "Crea una Tool en StarterPack",
-   "s": "Boton +, Tool. Apaga RequiresHandle en Properties."
+   "s": "Asi queda guardado y no se ve en el juego."
   },
   {
    "i": "file-code",
-   "t": "Dentro de la Tool, agrega un Script",
-   "s": "Boton +, Script. Borra lo que trae."
+   "t": "Agrega un Script a la Tool",
+   "s": "Clic en Arma (la Tool), boton +, Script. Borra lo que trae."
   },
   {
    "i": "keyboard",
@@ -157,7 +182,7 @@
   {
    "i": "play",
    "t": "Prueba tu juego",
-   "s": "Aprieta Play, equipa el arma y haz clic."
+   "s": "Aprieta Play, la tecla 1 para sacar el arma y haz clic."
   }
  ]
 }
