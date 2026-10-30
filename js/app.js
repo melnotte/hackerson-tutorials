@@ -17,9 +17,12 @@ function grid(){const g=$("#grid");g.textContent="";
   const ico=el("div","ico");ico.append(ic(t.icono));c.append(ico,el("h2","",t.titulo),m);
   c.onclick=()=>{location.hash=plat.id+"-"+t.id};g.append(c)});lucide.createIcons()}
  
-function codigoHasta(k){const arr=[];
- for(let j=0;j<=k;j++){const a=tut.pasos[j].add;if(!a||(tut.pasos[j].script||"")!==(tut.pasos[k].script||""))continue;const o=a.map(x=>({x,n:j===k}));
-  const dep=tut.pasos[j].inside;if(dep)arr.splice(arr.length-(dep===true?1:dep),0,...o);else arr.push(...o)}return arr}
+function codigoHasta(k){const sc=tut.pasos[k].script||"";const arr=((tut.base&&tut.base[sc])||[]).map(x=>({x,n:false}));
+ for(let j=0;j<=k;j++){const p=tut.pasos[j];if((p.script||"")!==sc)continue;
+  if(p.cambia){const i=arr.findIndex(l=>l.x===p.cambia[0]);if(i>=0)arr[i]={x:p.cambia[1],n:j===k}}
+  const a=p.add;if(!a)continue;const o=a.map(x=>({x,n:j===k}));
+  if(p.despues){const i=arr.findIndex(l=>l.x===p.despues);if(i>=0){arr.splice(i+1,0,...o);continue}}
+  const dep=p.inside;if(dep)arr.splice(arr.length-(dep===true?1:dep),0,...o);else arr.push(...o)}return arr}
  
 function parteDe(k){for(let j=k;j>=0;j--)if(tut.pasos[j].parte)return tut.pasos[j].parte+"  -  ";return ""}
 function dibuja(){try{localStorage.setItem("prog-"+plat.id+"-"+tut.id,paso>=tut.pasos.length?0:paso)}catch(e){}const v=$("#view");v.textContent="";const n=tut.pasos.length;
@@ -30,10 +33,10 @@ function dibuja(){try{localStorage.setItem("prog-"+plat.id+"-"+tut.id,paso>=tut.
   const r=el("div","reto");r.append(el("div","tag","Reto"),el("div","",tut.reto));f.append(r);st.append(f)}
  else{const p=tut.pasos[paso];const hd=el("div","hd");const ico=el("div","ico");ico.append(ic(p.i));const tx=el("div");tx.append(el("small","",parteDe(paso)+"Paso "+(paso+1)+" de "+n),el("h2","",p.t));hd.append(ico,tx);st.append(hd);
   if(p.s)st.append(el("p","ayuda",p.s));if(p.img){const im=el("img");im.src=p.img;im.alt=p.t;im.loading="lazy";im.style.cssText="max-width:100%;display:block;margin:0 0 18px;border-radius:20px;border:2px solid #ffffff22";im.onerror=()=>im.remove();st.append(im)}
-  if(p.add){if(p.script){const etq=el("div","tag");etq.append(ic("file-code"),document.createTextNode(p.donde||(p.script+" dentro de la Tool")));st.append(etq)}const code=el("div","code");code.setAttribute("aria-label","Codigo");codigoHasta(paso).forEach(l=>{code.append(el("div","ln"+(l.n?" new":""),l.x))});
-   st.append(code);const nt=el("div","nota");nt.append(ic("keyboard"),el("span","","Las lineas brillantes son las que escribes ahora. Escribelas tu mismo."));st.append(nt);
-   const w=el("div","why");const q=el("button","btn");q.append(ic("lightbulb"),document.createTextNode("Que hace?"));const txt=el("p","q",p.why);txt.hidden=true;txt.style.margin="14px 0 0";
-   q.onclick=()=>{txt.hidden=!txt.hidden};const w2=el("div");w2.append(q,txt);st.append(w2)}}
+  if(p.add||p.cambia||p.ver){if(p.script){const etq=el("div","tag");etq.append(ic("file-code"),document.createTextNode(p.donde||(p.script+" dentro de la Tool")));st.append(etq)}const code=el("div","code");code.setAttribute("aria-label","Codigo");codigoHasta(paso).forEach(l=>{code.append(el("div","ln"+(l.n?" new":""),l.x))});
+   st.append(code);if(!p.ver){const nt=el("div","nota");nt.append(ic("keyboard"),el("span","","Las lineas brillantes son las que escribes ahora. Escribelas tu mismo."));st.append(nt)}
+   if(p.why){const w=el("div","why");const q=el("button","btn");q.append(ic("lightbulb"),document.createTextNode("Que hace?"));const txt=el("p","q",p.why);txt.hidden=true;txt.style.margin="14px 0 0";
+   q.onclick=()=>{txt.hidden=!txt.hidden};const w2=el("div");w2.append(q,txt);st.append(w2)}}}
  const nav=el("div","nav");const at=el("button","btn");at.append(ic("arrow-left"),document.createTextNode("Atras"));at.disabled=paso===0;at.onclick=()=>{paso--;dibuja()};
  const sg=el("button","btn main");if(paso>=n){sg.append(ic("house"),document.createTextNode("Terminar"));sg.onclick=()=>{location.hash=plat.id}}else{sg.append(document.createTextNode("Listo, siguiente"),ic("arrow-right"));sg.onclick=()=>{paso++;dibuja()}}
  nav.append(at,sg);st.append(nav);v.append(top,st);v.classList.add("open");v.scrollTop=0;document.body.style.overflow="hidden";lucide.createIcons()}
