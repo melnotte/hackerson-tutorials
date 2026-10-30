@@ -22,6 +22,18 @@
         "icono": "coins",
         "titulo": "Recolectar monedas",
         "nivel": "Fácil"
+      },
+      {
+        "id": "golpe",
+        "icono": "hand",
+        "titulo": "Golpe que empuja y daña",
+        "nivel": "Medio"
+      },
+      {
+        "id": "animagolpe",
+        "icono": "clapperboard",
+        "titulo": "Anima tu golpe",
+        "nivel": "Medio"
       }
     ]
   },
