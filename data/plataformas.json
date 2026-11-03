@@ -34,6 +34,12 @@
         "icono": "clapperboard",
         "titulo": "Anima tu golpe",
         "nivel": "Medio"
+      },
+      {
+        "id": "gamepass",
+        "icono": "ticket",
+        "titulo": "Vender con Robux",
+        "nivel": "Medio"
       }
     ]
   },
