@@ -47,7 +47,7 @@
         "nivel": "Medio" 
       },
       {
-        "id": "habilidad-piezas",
+        "id": "habilidadpiezas",
         "icono": "sparkles",
         "titulo": "Habilidad: piezas que salen del piso",
         "nivel": "Medio"
