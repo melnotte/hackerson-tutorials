@@ -45,6 +45,12 @@
         "icono": "person-standing",
         "titulo": "Crea y anima tu personaje",
         "nivel": "Medio" 
+      },
+      {
+        "id": "habilidad-piezas",
+        "icono": "sparkles",
+        "titulo": "Habilidad: piezas que salen del piso",
+        "nivel": "Medio"
       }
     ]
   },
