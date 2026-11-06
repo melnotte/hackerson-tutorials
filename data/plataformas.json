@@ -40,6 +40,11 @@
         "icono": "ticket",
         "titulo": "Vender con Robux",
         "nivel": "Medio"
+      },
+      { "id": "rigr6",
+        "icono": "person-standing",
+        "titulo": "Crea y anima tu personaje",
+        "nivel": "Medio" 
       }
     ]
   },
