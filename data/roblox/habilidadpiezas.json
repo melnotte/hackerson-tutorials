@@ -1,88 +1,63 @@
 {
- "id": "habilidad-piezas",
- "icono": "sparkles",
- "titulo": "Habilidad: piezas que salen del piso",
- "nivel": "Medio",
- "reto": "Cambia COOLDOWN a 1 y luego a 10. ¿Qué cambia al jugar? Después cambia CANTIDAD a 10 y ALTURA a 8. ¿Qué pasa si pones el tiempo del Tween en 2 en vez de 0.4?",
+ "reto": "Cambia COOLDOWN a 1 y luego a 10 en los dos scripts. Que cambia al jugar? Despues cambia CANTIDAD a 10 y ALTURA a 8. Que pasa si pones el tiempo del Tween en 2 en vez de 0.4?",
  "pasos": [
-  {
-   "i": "package",
-   "t": "Crea el RemoteEvent",
-   "s": "En el Explorer pasa el mouse sobre ReplicatedStorage, botón +, RemoteEvent. Ponle de nombre HabilidadPiezas (igualito, con mayúsculas). Es como un teléfono: el jugador avisa y el servidor hace el efecto para que todos lo vean.",
-   "parte": "Parte 1: Prepara los scripts"
-  },
-  {
-   "i": "server",
-   "t": "Crea el Script del servidor",
-   "s": "Pasa el mouse sobre ServerScriptService, botón +, Script. Ponle de nombre ServidorHabilidad. Borra el print que trae."
-  },
-  {
-   "i": "keyboard",
-   "t": "Crea el LocalScript",
-   "s": "Abre StarterPlayer y pasa el mouse sobre StarterPlayerScripts, botón +, LocalScript. Ponle de nombre ClienteHabilidad. Borra el print que trae."
-  },
-  {
-   "i": "mouse-pointer-click",
-   "t": "El LocalScript: la tecla",
-   "s": "Abre ClienteHabilidad y pega este código:\n\nlocal UserInputService = game:GetService(\"UserInputService\")\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\n\nlocal evento = ReplicatedStorage:WaitForChild(\"HabilidadPiezas\")\n\nlocal TECLA = Enum.KeyCode.E\nlocal COOLDOWN = 3 -- segundos de espera entre usos\nlocal listo = true -- el debounce: true = puedo usarla\n\nUserInputService.InputBegan:Connect(function(input, loEscribiendo)\n  if loEscribiendo then return end -- no si esta escribiendo en el chat\n  if input.KeyCode ~= TECLA then return end\n  if not listo then return end -- todavia esta en cooldown\n\n  listo = false\n  evento:FireServer()\n\n  task.wait(COOLDOWN)\n  listo = true\nend)\n\nTECLA es la tecla de la habilidad (aquí es E). COOLDOWN es cuántos segundos tienes que esperar. La variable listo es el debounce: se apaga al usar la habilidad y se prende cuando termina la espera. Así, aunque aprietes E mil veces, solo se usa una vez cada 3 segundos.",
-   "parte": "Parte 2: La tecla, el debounce y el cooldown"
-  },
-  {
-   "i": "timer",
-   "t": "Cómo funciona la espera",
-   "s": "Cuando aprietas E: 1) revisa que listo sea true, 2) lo pone en false, 3) avisa al servidor, 4) espera COOLDOWN segundos, 5) lo vuelve a poner en true. Mientras listo sea false, el if not listo then return end corta el código y no pasa nada."
-  },
-  {
-   "i": "code",
-   "t": "El Script: crea las piezas",
-   "s": "Abre ServidorHabilidad y pega este código:\n\nlocal ReplicatedStorage = game:GetService(\"ReplicatedStorage\")\nlocal TweenService = game:GetService(\"TweenService\")\nlocal Debris = game:GetService(\"Debris\")\nlocal Players = game:GetService(\"Players\")\n\nlocal evento = ReplicatedStorage:WaitForChild(\"HabilidadPiezas\")\n\nlocal COOLDOWN = 3\nlocal CANTIDAD = 5\nlocal ALTURA = 4\nlocal ultimoUso = {}\n\nlocal function crearPiezas(personaje)\n  local raiz = personaje:FindFirstChild(\"HumanoidRootPart\")\n  if not raiz then return end\n\n  local params = RaycastParams.new()\n  params.FilterType = Enum.RaycastFilterType.Exclude\n  params.FilterDescendantsInstances = {personaje}\n\n  for i = 1, CANTIDAD do\n    -- un punto cada vez mas lejos, enfrente del personaje\n    local punto = (raiz.CFrame * CFrame.new(0, 0, -3 - i * 2.5)).Position\n\n    -- rayo hacia abajo para encontrar el piso\n    local resultado = workspace:Raycast(punto + Vector3.new(0, 5, 0), Vector3.new(0, -30, 0), params)\n\n    if resultado then\n      local piso = resultado.Position\n\n      local pieza = Instance.new(\"Part\")\n      pieza.Anchored = true\n      pieza.CanCollide = false\n      pieza.Material = Enum.Material.Neon\n      pieza.Color = Color3.fromRGB(0, 170, 255)\n      pieza.Size = Vector3.new(2, ALTURA, 2)\n\n      -- empieza escondida debajo del piso, girada al azar\n      local abajo = piso - Vector3.new(0, ALTURA / 2, 0)\n      pieza.CFrame = CFrame.new(abajo) * CFrame.Angles(0, math.rad(math.random(0, 90)), 0)\n      pieza.Parent = workspace\n\n      -- sale del piso\n      local arriba = piso + Vector3.new(0, ALTURA / 2, 0)\n      TweenService:Create(pieza, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {\n        Position = arriba\n      }):Play()\n\n      -- despues de 2 segundos se vuelve a esconder\n      task.delay(2, function()\n        TweenService:Create(pieza, TweenInfo.new(0.4), {Position = abajo}):Play()\n      end)\n      Debris:AddItem(pieza, 3)\n    end\n\n    task.wait(0.1) -- una tras otra, como una ola\n  end\nend\n\nevento.OnServerEvent:Connect(function(jugador)\n  -- el servidor tambien revisa el cooldown, por si alguien hace trampa\n  local ahora = os.clock()\n  if ultimoUso[jugador] and ahora - ultimoUso[jugador] < COOLDOWN then return end\n  ultimoUso[jugador] = ahora\n\n  if jugador.Character then\n    crearPiezas(jugador.Character)\n  end\nend)\n\nPlayers.PlayerRemoving:Connect(function(jugador)\n  ultimoUso[jugador] = nil\nend)",
-   "parte": "Parte 3: El efecto en el servidor"
-  },
-  {
-   "i": "crosshair",
-   "t": "Cómo se ponen enfrente de ti",
-   "s": "raiz.CFrame * CFrame.new(0, 0, -3 - i * 2.5) significa: parte desde el HumanoidRootPart y avanza hacia adelante. En Roblox, adelante es el eje Z negativo. Como i va de 1 a 5, cada pieza queda un poco más lejos que la anterior."
-  },
-  {
-   "i": "arrow-down-to-line",
-   "t": "Cómo encuentra el piso",
-   "s": "Workspace:Raycast lanza un rayo invisible hacia abajo y te dice dónde choca. Así las piezas quedan pegadas al piso aunque haya cuestas o escalones. Con FilterDescendantsInstances le decimos al rayo que ignore a tu personaje."
-  },
-  {
-   "i": "arrow-up-from-line",
-   "t": "Cómo salen de abajo",
-   "s": "Cada pieza nace escondida debajo del piso (posición abajo). Luego TweenService la mueve a la posición arriba. TweenInfo.new(0.4, Back, Out) hace que suba rápido y rebote un poquito al final. Si el número 0.4 es más grande, sube más lento."
-  },
-  {
-   "i": "trash-2",
-   "t": "Cómo desaparecen",
-   "s": "task.delay(2, ...) espera 2 segundos y hace otro Tween que hunde la pieza otra vez. Debris:AddItem(pieza, 3) la borra a los 3 segundos para que no se llene tu juego de piezas."
-  },
-  {
-   "i": "shield-check",
-   "t": "Por qué hay otro cooldown en el servidor",
-   "s": "El LocalScript vive en la computadora del jugador y alguien podría hackearlo para saltarse la espera. Por eso el Script del servidor también guarda la hora del último uso en ultimoUso y se fija si ya pasaron COOLDOWN segundos. Si no, ignora la petición."
-  },
-  {
-   "i": "play",
-   "t": "Pruébala",
-   "s": "Dale Play. Camina a un lugar con piso y aprieta E. Deberían salir 5 piezas enfrente de ti, una tras otra. Aprieta E muchas veces seguidas: solo debe funcionar una vez cada 3 segundos.",
-   "parte": "Parte 4: Pruébala y mejórala"
-  },
-  {
-   "i": "palette",
-   "t": "Cambia el estilo",
-   "s": "En el Script del servidor cambia Color3.fromRGB(0, 170, 255) por otro color, Enum.Material.Neon por Ice o Rock, o el tamaño Vector3.new(2, ALTURA, 2). Prueba con piezas anchas y bajitas, o delgadas y altas."
-  },
-  {
-   "i": "clapperboard",
-   "t": "Extra: agrégale tu animación",
-   "s": "Si ya hiciste una animación de apuntar al piso, ponle un Animation Event llamado Spawn en el keyframe del golpe. En el servidor carga la animación con Animator:LoadAnimation, conecta track:GetMarkerReachedSignal(\"Spawn\") para llamar a crearPiezas(personaje) y después haz track:Play(). Así las piezas salen justo cuando tu personaje apunta."
-  },
-  {
-   "i": "bug",
-   "t": "Si no funciona",
-   "s": "Pestaña Vista, Salida, y enséñale el mensaje rojo al profe. Revisa: que el RemoteEvent esté en ReplicatedStorage y se llame HabilidadPiezas igualito, que el Script esté en ServerScriptService (no en StarterPlayerScripts), que el LocalScript esté en StarterPlayerScripts, y que estés parado sobre un piso (el rayo necesita algo donde chocar). Si no aparecen piezas, prueba a apretar E sin estar escribiendo en el chat. Si salen del lado equivocado, cambia el -3 - i * 2.5 por 3 + i * 2.5."
-  }
+  {"i":"radio","t":"Crea un RemoteEvent","s":"En ReplicatedStorage: boton +, RemoteEvent. Nombre: HabilidadPiezas, igualito y con mayusculas. Es un mensajero: tu computadora le avisa al servidor y el servidor crea las piezas para que todos las vean.","parte":"Parte 1: Preparacion"},
+  {"i":"file-code","t":"Agrega un LocalScript","s":"En StarterPlayer abre StarterPlayerScripts: boton +, LocalScript (no Script). Nombre: ClienteHabilidad. Borra lo que trae."},
+  {"i":"file-code","t":"Agrega un Script","s":"En ServerScriptService: boton +, Script (el normal). Nombre: ServidorHabilidad. Borra lo que trae."},
+  {"i":"keyboard","t":"Trae el teclado","s":"Abre ClienteHabilidad. Escribe esta linea tu mismo.","add":["local UIS = game:GetService(\"UserInputService\")"],"why":"UserInputService sabe todo lo que aprietas: teclas, clics y toques. UIS es su nombre corto.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts","parte":"Parte 2: La tecla y el cooldown"},
+  {"i":"radio","t":"Agarra el mensajero","s":"Escribe.","add":["local evento = game:GetService(\"ReplicatedStorage\"):WaitForChild(\"HabilidadPiezas\")"],"why":"Busca el RemoteEvent que creaste. Escribe el nombre igualito.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"keyboard","t":"Que tecla?","s":"Escribe.","add":["local TECLA = Enum.KeyCode.E"],"why":"Es la tecla de tu habilidad. Un nombre en MAYUSCULAS es algo que quizas quieras cambiar. Prueba con Q o R.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"timer","t":"Cuanto cooldown?","s":"Escribe.","add":["local COOLDOWN = 3"],"why":"Cooldown es la espera entre un uso y el siguiente. Son 3 segundos.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"toggle-right","t":"Estas listo?","s":"Escribe.","add":["local listo = true"],"why":"Esta variable se llama debounce. true quiere decir: puedo usar la habilidad. false quiere decir: tengo que esperar.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"mouse-pointer-click","t":"Cuando aprietes algo","s":"Escribe las 3 lineas.","add":["","UIS.InputBegan:Connect(function(input, procesado)","end)"],"why":"Pasa cada vez que aprietas una tecla o un boton. input dice cual fue.","script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"ban","t":"Ignora el chat","s":"Escribe dentro, con Tab.","add":["\tif procesado then return end"],"why":"procesado es true si estas escribiendo en el chat o tocando un menu. return es salir. Asi no se activa la habilidad mientras escribes.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"git-branch","t":"Fue la tecla correcta?","s":"Escribe dentro.","add":["\tif input.KeyCode ~= TECLA then return end"],"why":"~= quiere decir 'es diferente a'. Si apretaste otra tecla, salimos y no pasa nada.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"hourglass","t":"Esta esperando?","s":"Escribe dentro.","add":["\tif not listo then return end"],"why":"not es 'no'. Si listo es false, todavia estas en cooldown, asi que salimos.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"lock","t":"Apaga el debounce","s":"Escribe dentro.","add":["\tlisto = false"],"why":"Desde ahora no puedes usar la habilidad otra vez, aunque aprietes E mil veces.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"send","t":"Manda el mensaje","s":"Escribe dentro.","add":["\tevento:FireServer()"],"why":"FireServer le avisa al servidor: use la habilidad.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"timer","t":"Espera el cooldown","s":"Escribe dentro.","add":["\ttask.wait(COOLDOWN)"],"why":"El codigo se detiene aqui 3 segundos.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"lock-open","t":"Vuelve a prender","s":"Escribe dentro.","add":["\tlisto = true"],"why":"Ya paso la espera. Puedes usar la habilidad otra vez.","inside":1,"script":"LocalScript","donde":"LocalScript en StarterPlayerScripts"},
+  {"i":"keyboard","t":"Trae los servicios","s":"Ahora abre ServidorHabilidad. Escribe estas 2 lineas tu mismo.","add":["local TweenService = game:GetService(\"TweenService\")","local Debris = game:GetService(\"Debris\")"],"why":"TweenService mueve cosas suave, como una animacion. Debris borra cosas despues de un tiempo.","script":"Script","donde":"Script en ServerScriptService","parte":"Parte 3: Las piezas en el servidor"},
+  {"i":"radio","t":"Agarra el mensajero","s":"Escribe.","add":["local evento = game:GetService(\"ReplicatedStorage\"):WaitForChild(\"HabilidadPiezas\")"],"why":"Es el mismo RemoteEvent. Aqui escuchamos el mensaje.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"timer","t":"Cooldown del servidor","s":"Escribe.","add":["local COOLDOWN = 3"],"why":"El servidor tambien revisa la espera. Un jugador tramposo podria hackear su LocalScript para saltarsela.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"hash","t":"Cuantas piezas?","s":"Escribe.","add":["local CANTIDAD = 5"],"why":"Es cuantas piezas salen del piso en cada uso.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"ruler","t":"Que altura?","s":"Escribe.","add":["local ALTURA = 4"],"why":"Es que tan altas son las piezas.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"list","t":"Lista de ultimos usos","s":"Escribe.","add":["local ultimoUso = {}"],"why":"Las llaves {} son una lista vacia. Aqui anotamos a que hora uso la habilidad cada jugador.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"sparkles","t":"Crea la funcion","s":"Escribe las 3 lineas.","add":["","local function crearPiezas(personaje)","end"],"why":"Una funcion es una receta con nombre. Todo lo que escribas dentro se ejecuta cada vez que la llamemos. personaje es quien usa la habilidad.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"crosshair","t":"Tu centro","s":"Escribe dentro, con Tab.","add":["\tlocal raiz = personaje:FindFirstChild(\"HumanoidRootPart\")"],"why":"HumanoidRootPart es la pieza del centro de tu cuerpo. De ahi medimos hacia donde van las piezas.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"ban","t":"Existe tu centro?","s":"Escribe dentro.","add":["\tif not raiz then return end"],"why":"Si no tienes cuerpo, salimos de la funcion.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"scan-line","t":"Reglas del rayo","s":"Escribe dentro.","add":["\tlocal reglas = RaycastParams.new()"],"why":"Un rayo es una linea invisible que avisa con que choca. Vamos a usar uno para encontrar el piso. Esto son sus reglas.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"list-checks","t":"Modo ignorar","s":"Escribe dentro.","add":["\treglas.FilterType = Enum.RaycastFilterType.Exclude"],"why":"Exclude significa: ignora lo que esta en la lista.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"eye-off","t":"Ignora tu cuerpo","s":"Escribe dentro.","add":["\treglas.FilterDescendantsInstances = {personaje}"],"why":"Asi el rayo no choca contigo.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"repeat","t":"Repite por cada pieza","s":"Escribe las 2 lineas dentro.","add":["\tfor i = 1, CANTIDAD do","\tend"],"why":"for repite lo que este entre for y end. i vale 1, luego 2, luego 3... hasta CANTIDAD.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"footprints","t":"Un punto mas lejos","s":"Escribe dentro del for, con dos Tab.","add":["\t\tlocal punto = (raiz.CFrame * CFrame.new(0, 0, -3 - i * 2.5)).Position"],"why":"Parte de tu centro y avanza hacia adelante (adelante es Z negativo). Como i crece, cada pieza queda mas lejos que la anterior.","inside":2,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"arrow-down-to-line","t":"Busca el piso","s":"Escribe dentro del for.","add":["\t\tlocal resultado = workspace:Raycast(punto + Vector3.new(0, 5, 0), Vector3.new(0, -30, 0), reglas)"],"why":"Lanza el rayo hacia abajo desde un poco arriba del punto. resultado dice donde choco. Si no hay piso, esta vacio.","inside":2,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"git-branch","t":"Hay piso?","s":"Escribe las 2 lineas dentro del for.","add":["\t\tif resultado then","\t\tend"],"why":"Solo creamos la pieza si el rayo encontro piso.","inside":2,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"map-pin","t":"Donde esta el piso","s":"Escribe dentro del if, con tres Tab.","add":["\t\t\tlocal piso = resultado.Position"],"why":"Position es el punto exacto donde el rayo choco con el piso.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"box","t":"Crea la pieza","s":"Escribe.","add":["\t\t\tlocal pieza = Instance.new(\"Part\")"],"why":"Instance.new crea una pieza nueva desde codigo.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"lock","t":"Fija la pieza","s":"Escribe las 2 lineas.","add":["\t\t\tpieza.Anchored = true","\t\t\tpieza.CanCollide = false"],"why":"Anchored la deja quieta en el aire. CanCollide en false hace que no estorbe ni empuje a nadie.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"palette","t":"Color y material","s":"Escribe las 2 lineas.","add":["\t\t\tpieza.Material = Enum.Material.Neon","\t\t\tpieza.Color = Color3.fromRGB(0, 170, 255)"],"why":"Neon brilla. fromRGB mezcla rojo, verde y azul del 0 al 255. Cambialos cuando termines.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"maximize","t":"Tamano","s":"Escribe.","add":["\t\t\tpieza.Size = Vector3.new(2, ALTURA, 2)"],"why":"Ancho 2, alto ALTURA, largo 2.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"arrow-down","t":"Posicion escondida","s":"Escribe.","add":["\t\t\tlocal abajo = piso - Vector3.new(0, ALTURA / 2, 0)"],"why":"Es un punto debajo del piso, a la mitad de la altura. Ahi nace la pieza, escondida.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"rotate-3d","t":"Ponla y girala","s":"Escribe.","add":["\t\t\tpieza.CFrame = CFrame.new(abajo) * CFrame.Angles(0, math.rad(math.random(0, 90)), 0)"],"why":"La pone en abajo y la gira un angulo al azar entre 0 y 90 grados, para que no se vean todas iguales.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"globe","t":"Ponla en el juego","s":"Escribe.","add":["\t\t\tpieza.Parent = workspace"],"why":"Hasta que este en workspace, nadie la ve.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"arrow-up","t":"Posicion de arriba","s":"Escribe.","add":["\t\t\tlocal arriba = piso + Vector3.new(0, ALTURA / 2, 0)"],"why":"Es el punto donde la pieza queda parada sobre el piso.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"move-up","t":"Sale del piso","s":"Escribe.","add":["\t\t\tTweenService:Create(pieza, TweenInfo.new(0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out), {Position = arriba}):Play()"],"why":"Mueve la pieza suave de abajo a arriba en 0.4 segundos. Back y Out hacen que suba rapido y rebote un poquito. Si pones un numero mas grande que 0.4, sube mas lento.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"hourglass","t":"Despues de 2 segundos","s":"Escribe las 2 lineas.","add":["\t\t\ttask.delay(2, function()","\t\t\tend)"],"why":"task.delay espera 2 segundos y despues ejecuta lo que este adentro, sin detener el resto del codigo.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"move-down","t":"Se esconde otra vez","s":"Escribe dentro del delay, con cuatro Tab.","add":["\t\t\t\tTweenService:Create(pieza, TweenInfo.new(0.4), {Position = abajo}):Play()"],"why":"Otro Tween: hunde la pieza de nuevo debajo del piso.","inside":4,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"trash-2","t":"Borrala","s":"Escribe despues del end) del delay, con tres Tab.","add":["\t\t\tDebris:AddItem(pieza, 3)"],"why":"A los 3 segundos la pieza se borra para siempre. Asi tu juego no se llena de piezas.","inside":3,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"timer","t":"Una tras otra","s":"Escribe despues del end del if resultado, con dos Tab.","add":["\t\ttask.wait(0.1)"],"why":"Espera una decima de segundo antes de la siguiente pieza. Asi salen como una ola.","inside":2,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"inbox","t":"Cuando llegue el mensaje","s":"Escribe despues del end de la funcion. Son 3 lineas.","add":["","evento.OnServerEvent:Connect(function(jugador)","end)"],"why":"Pasa cuando el LocalScript manda el mensaje. jugador es quien aprieto la tecla.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"clock","t":"Que hora es?","s":"Escribe dentro, con Tab.","add":["\tlocal ahora = os.clock()"],"why":"os.clock da los segundos que lleva corriendo el juego. Es nuestro reloj.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"hourglass","t":"Ya paso el cooldown?","s":"Escribe dentro.","add":["\tif ultimoUso[jugador] and ahora - ultimoUso[jugador] < COOLDOWN then return end"],"why":"Si este jugador ya uso la habilidad y no han pasado 3 segundos, ignoramos el mensaje.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"pencil","t":"Anota la hora","s":"Escribe dentro.","add":["\tultimoUso[jugador] = ahora"],"why":"Guarda a que hora uso la habilidad este jugador.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"git-branch","t":"Tiene personaje?","s":"Escribe las 2 lineas dentro.","add":["\tif jugador.Character then","\tend"],"why":"Character es el cuerpo del jugador. Solo seguimos si existe.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"sparkles","t":"Llama a la funcion","s":"Escribe dentro del if, con dos Tab.","add":["\t\tcrearPiezas(jugador.Character)"],"why":"Ejecuta la receta que hicimos arriba con el cuerpo de este jugador.","inside":2,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"log-out","t":"Limpia cuando se vaya","s":"Escribe despues del end) del evento. Son 3 lineas.","add":["","game:GetService(\"Players\").PlayerRemoving:Connect(function(jugador)","end)"],"why":"Pasa cuando un jugador sale del juego.","script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"trash-2","t":"Borra su anotacion","s":"Escribe dentro, con Tab.","add":["\tultimoUso[jugador] = nil"],"why":"nil es nada. Asi la lista no se llena de jugadores que ya se fueron.","inside":1,"script":"Script","donde":"Script en ServerScriptService"},
+  {"i":"play","t":"Prueba tu habilidad","s":"Aprieta Play. Camina a un lugar con piso y aprieta E. Deben salir 5 piezas enfrente de ti, una tras otra. Aprieta E muchas veces seguidas: solo debe funcionar una vez cada 3 segundos.","parte":"Parte 4: Pruebala y mejorala"},
+  {"i":"palette","t":"Cambia el estilo","s":"En el Script cambia el color de Color3.fromRGB(0, 170, 255), cambia Enum.Material.Neon por Ice o Rock, o cambia el tamano Vector3.new(2, ALTURA, 2). Prueba piezas anchas y bajitas, o delgadas y altas."},
+  {"i":"clapperboard","t":"Extra: agregale tu animacion","s":"Si ya hiciste una animacion de apuntar al piso, ponle un Animation Event llamado Spawn en el keyframe del golpe. En el Script carga la animacion con Animator:LoadAnimation, conecta track:GetMarkerReachedSignal(\"Spawn\") para llamar a crearPiezas(personaje) y despues haz track:Play(). Asi las piezas salen justo cuando tu personaje apunta."},
+  {"i":"bug","t":"Si no funciona","s":"Pestana Vista, Salida. Lee el mensaje rojo y ensenaselo al profe. Revisa: que el RemoteEvent este en ReplicatedStorage y se llame HabilidadPiezas igualito, que el Script este en ServerScriptService y el LocalScript en StarterPlayerScripts, y que estes parado sobre un piso (el rayo necesita algo donde chocar). Si las piezas salen del lado equivocado, cambia -3 - i * 2.5 por 3 + i * 2.5."}
  ]
 }
