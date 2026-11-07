@@ -51,6 +51,12 @@
         "icono": "sparkles",
         "titulo": "Habilidad: piezas que salen del piso",
         "nivel": "Medio"
+      },
+      {
+        "id": "animnativa",
+        "icono": "footprints",
+        "titulo": "Cambia tu animación de caminar",
+        "nivel": "Medio"
       }
     ]
   },
