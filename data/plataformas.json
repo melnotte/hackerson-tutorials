@@ -63,6 +63,12 @@
         "icono": "footprints",
         "titulo": "Cambia tu animación de caminar",
         "nivel": "Medio"
+      },
+      {
+        "id": "damage",
+        "icono": "heart-crack",
+        "titulo": "Objeto que resta vida: cooldown y debounce",
+        "nivel": "Fácil"
       }
     ]
   },
