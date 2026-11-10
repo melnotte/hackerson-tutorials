@@ -36,6 +36,12 @@
         "nivel": "Medio"
       },
       {
+        "id": "slap",
+        "icono": "hand-metal",
+        "titulo": "Slap Tool: mano que empuja",
+        "nivel": "Medio"
+      },
+      {
         "id": "gamepass",
         "icono": "ticket",
         "titulo": "Vender con Robux",
