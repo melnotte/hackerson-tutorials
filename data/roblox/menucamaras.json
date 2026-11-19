@@ -1,0 +1,372 @@
+{
+  "titulo": "Menú de cámaras en Roblox Studio: ScreenGui, Frame, Botones y LocalScript",
+  "idioma": "es",
+  "nivel": "Principiante",
+  "duracion_estimada": "30 a 40 minutos",
+  "producto_final": {
+    "que_vamos_a_lograr": "Un menú en pantalla con un botón «Abrir». Al presionarlo aparece un panel con dos botones (1 y 2) y una X para cerrar. Cada botón mueve tu cámara a una pieza distinta del mapa (Cam1 o Cam2), como si cambiaras de cámara de seguridad.",
+    "resultado_visual": [
+      "Al iniciar el juego solo ves el botón «Abrir».",
+      "Presionas «Abrir» y aparece el panel con los botones 1, 2 y X.",
+      "Presionas 1 o 2 y tu cámara salta a esa pieza; el panel se cierra solo.",
+      "Presionas X (o «Abrir» otra vez) para cerrar el panel."
+    ],
+    "lo_que_aprenderas": [
+      "Qué es un ScreenGui, un Frame y un botón, y cómo se organizan.",
+      "Qué hace un LocalScript y por qué las interfaces lo usan.",
+      "Cómo conectar un botón con una acción usando eventos.",
+      "Cómo cambiar la cámara a modo Scriptable para controlarla con código.",
+      "Cómo mostrar y ocultar interfaces con la propiedad Visible."
+    ]
+  },
+  "resumen_inicial": {
+    "idea_general": "Una interfaz (UI) en Roblox es un árbol de objetos: un ScreenGui contiene Frames y botones. Los botones no hacen nada solos; un LocalScript «escucha» cuando los presionas y ejecuta código.",
+    "que_es_camara_scriptable": "Normalmente la cámara sigue a tu personaje y tú la controlas con el ratón o el teclado (tipo Custom). Cuando la ponemos en Scriptable, el juego desactiva ese control manual: la cámara se queda quieta hasta que el código (Lua) la mueva, la rote o le haga zoom. Por eso podemos «teletransportarla» a una pieza con una sola línea.",
+    "piezas_del_proyecto": [
+      "ScreenGui «Menu»: el contenedor de toda la interfaz.",
+      "Frame «Frame»: el panel que se abre y se cierra.",
+      "TextButtons «1», «2» y «X»: botones dentro del panel.",
+      "ImageButton «Abrir»: botón fuera del panel, siempre visible.",
+      "LocalScript «changeCamera»: mueve la cámara a Cam1 o Cam2.",
+      "LocalScript «openCloseButton»: abre y cierra el panel.",
+      "Parts «Cam1» y «Cam2» en Workspace: los puntos de vista."
+    ]
+  },
+  "antes_de_empezar": {
+    "necesitas": [
+      "Roblox Studio abierto con un lugar (Baseplate sirve).",
+      "Las ventanas Explorer y Properties visibles (menú View → Explorer / Properties)."
+    ],
+    "consejo": "Escribe los nombres EXACTAMENTE como en el tutorial, con mayúsculas y minúsculas. El código busca los objetos por nombre y si no coinciden no funciona."
+  },
+  "estructura_final_en_explorer": {
+    "descripcion": "Así debe verse tu Explorer al terminar. Lo que está dentro de StarterGui se copia a cada jugador cuando entra al juego.",
+    "arbol": [
+      "StarterGui",
+      "└── Menu (ScreenGui)",
+      "    ├── changeCamera (LocalScript)",
+      "    ├── openCloseButton (LocalScript)",
+      "    ├── Frame (Frame)",
+      "    │   ├── 1 (TextButton)",
+      "    │   ├── 2 (TextButton)",
+      "    │   └── X (TextButton)",
+      "    └── Abrir (ImageButton)",
+      "",
+      "Workspace",
+      "├── Cam1 (Part)",
+      "└── Cam2 (Part)"
+    ]
+  },
+  "pasos": [
+    {
+      "numero": 1,
+      "titulo": "Crear las piezas de cámara (Cam1 y Cam2)",
+      "objetivo": "Tener dos lugares a donde enviar la cámara.",
+      "instrucciones": [
+        {
+          "haz_esto": "En la pestaña Home, inserta dos Parts (Part → Block) y ponles de nombre Cam1 y Cam2 en el Explorer.",
+          "por_que": "El código buscará estos nombres exactos dentro de Workspace."
+        },
+        {
+          "haz_esto": "Colócalas en dos lugares distintos con las herramientas Move y Rotate.",
+          "por_que": "La cámara se pondrá en la posición de la pieza y mirará hacia donde apunta su cara frontal."
+        },
+        {
+          "haz_esto": "En Properties activa Anchored en las dos.",
+          "por_que": "Así no se caen ni se mueven por la física."
+        },
+        {
+          "haz_esto": "Opcional: pon CanCollide en falso y Transparency en 1 cuando ya las hayas acomodado.",
+          "por_que": "Para que los jugadores no las vean ni choquen con ellas; son solo puntos de vista."
+        }
+      ],
+      "consejo": "Si al probar la cámara mira hacia otro lado, rota la pieza. La dirección que importa es la cara frontal (Front) de la Part."
+    },
+    {
+      "numero": 2,
+      "titulo": "Crear el ScreenGui «Menu»",
+      "objetivo": "Crear el contenedor de toda la interfaz.",
+      "instrucciones": [
+        {
+          "haz_esto": "En el Explorer, pasa el mouse sobre StarterGui, presiona el botón + y elige ScreenGui.",
+          "por_que": "Un ScreenGui es la «hoja» donde se dibuja la interfaz sobre la pantalla del jugador."
+        },
+        {
+          "haz_esto": "Renómbralo a Menu.",
+          "por_que": "Los scripts usarán script.Parent para encontrarlo; el nombre ayuda a mantener orden."
+        },
+        {
+          "haz_esto": "Opcional: en Properties, desactiva ResetOnSpawn.",
+          "por_que": "Si está activo, la interfaz se reinicia cada vez que tu personaje reaparece (por ejemplo, al morir)."
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "titulo": "Crear el Frame (el panel del menú)",
+      "objetivo": "Hacer el panel que contendrá los botones 1, 2 y X.",
+      "instrucciones": [
+        {
+          "haz_esto": "Dentro de Menu, presiona + y agrega un Frame. Déjalo con el nombre Frame.",
+          "por_que": "Un Frame es una caja rectangular que agrupa elementos. Si lo ocultas, se ocultan todos sus botones."
+        },
+        {
+          "haz_esto": "En Properties ajusta Size (por ejemplo {0.3, 0},{0.4, 0}) y Position (por ejemplo {0.35, 0},{0.3, 0}).",
+          "por_que": "Los valores con decimales (Scale) se adaptan al tamaño de cada pantalla: celular, tablet o PC."
+        },
+        {
+          "haz_esto": "Elige un BackgroundColor3 que te guste.",
+          "por_que": "Solo estética, pero ayuda a distinguir el panel del juego."
+        }
+      ],
+      "nota": "No te preocupes si el Frame está visible ahora: el script lo ocultará al iniciar el juego (frame.Visible = false)."
+    },
+    {
+      "numero": 4,
+      "titulo": "Crear los botones 1, 2 y X dentro del Frame",
+      "objetivo": "Tener tres botones de texto dentro del panel.",
+      "instrucciones": [
+        {
+          "haz_esto": "Dentro de Frame, presiona + y agrega un TextButton. Nómbralo 1 y en la propiedad Text escribe 1 (o «Cámara 1»).",
+          "por_que": "Name es lo que ve el código; Text es lo que ve el jugador. Son cosas distintas."
+        },
+        {
+          "haz_esto": "Repite para el segundo botón: nombre 2, texto 2 (o «Cámara 2»).",
+          "por_que": "Cada botón llevará a una cámara distinta."
+        },
+        {
+          "haz_esto": "Agrega un tercer TextButton con nombre X y texto X.",
+          "por_que": "Será el botón para cerrar el panel."
+        },
+        {
+          "haz_esto": "Acomódalos con Position y Size para que no se encimen.",
+          "por_que": "Si se superponen, el jugador no podrá presionar el botón de abajo."
+        }
+      ],
+      "consejo": "Los nombres «1», «2» y «X» deben quedar exactamente así, porque el script los busca con WaitForChild(\"1\"), WaitForChild(\"2\") y WaitForChild(\"X\")."
+    },
+    {
+      "numero": 5,
+      "titulo": "Crear el botón «Abrir» (fuera del Frame)",
+      "objetivo": "Tener un botón siempre visible que abra el panel.",
+      "instrucciones": [
+        {
+          "haz_esto": "Dentro de Menu (NO dentro de Frame), agrega un ImageButton y nómbralo Abrir. También puedes usar un TextButton.",
+          "por_que": "Si estuviera dentro del Frame, desaparecería junto con él y no podrías volver a abrir el panel."
+        },
+        {
+          "haz_esto": "Colócalo en una esquina con Position y Size, y ponle una imagen en la propiedad Image (o texto si usas TextButton).",
+          "por_que": "Es el botón que el jugador verá todo el tiempo."
+        }
+      ],
+      "error_comun": "Dejar «Abrir» dentro del Frame. Verifica en el Explorer que esté al mismo nivel que Frame."
+    },
+    {
+      "numero": 6,
+      "titulo": "Script 1: changeCamera (mueve la cámara)",
+      "objetivo": "Hacer que los botones 1 y 2 muevan la cámara a Cam1 y Cam2.",
+      "instrucciones": [
+        {
+          "haz_esto": "Dentro de Menu, presiona + y agrega un LocalScript. Nómbralo changeCamera.",
+          "por_que": "Las interfaces y la cámara existen en el equipo del jugador (cliente), por eso se usa LocalScript y no Script."
+        },
+        {
+          "haz_esto": "Borra el código que trae y pega el código de abajo.",
+          "por_que": "Revisa la explicación para entender cada parte, no solo copiarla."
+        }
+      ],
+      "codigo": "local camera = workspace.CurrentCamera\n\nlocal menu = script.Parent\nlocal frame = menu:WaitForChild(\"Frame\")\nlocal boton1 = frame:WaitForChild(\"1\")\nlocal boton2 = frame:WaitForChild(\"2\")\n\nlocal cam1 = workspace:WaitForChild(\"Cam1\")\nlocal cam2 = workspace:WaitForChild(\"Cam2\")\n\nlocal function irACamara(parte)\n\tcamera.CameraType = Enum.CameraType.Scriptable\n\tcamera.CFrame = parte.CFrame\n\tframe.Visible = false -- cierra el menú al elegir\nend\n\nboton1.MouseButton1Click:Connect(function()\n\tirACamara(cam1)\nend)\n\nboton2.MouseButton1Click:Connect(function()\n\tirACamara(cam2)\nend)",
+      "que_hace_este_codigo": [
+        {
+          "bloque": "local camera = workspace.CurrentCamera",
+          "explicacion": "Guarda en una variable la cámara que usa el jugador. Todo lo que cambiemos en 'camera' se verá en su pantalla."
+        },
+        {
+          "bloque": "local menu = script.Parent",
+          "explicacion": "script es este LocalScript y .Parent es su padre, en este caso el ScreenGui Menu. Desde ahí buscamos los demás objetos."
+        },
+        {
+          "bloque": "menu:WaitForChild(\"Frame\")  /  frame:WaitForChild(\"1\")",
+          "explicacion": "WaitForChild espera hasta que el objeto exista y luego lo devuelve. Es más seguro que escribir menu.Frame, porque los objetos de la UI pueden tardar un instante en cargar."
+        },
+        {
+          "bloque": "workspace:WaitForChild(\"Cam1\")  /  Cam2",
+          "explicacion": "Busca las dos Parts en el mundo. Estas serán los destinos de la cámara."
+        },
+        {
+          "bloque": "local function irACamara(parte)",
+          "explicacion": "Creamos una función reutilizable. 'parte' es un parámetro: cuando la llamemos le diremos a qué pieza ir. Así no repetimos el mismo código para cada botón."
+        },
+        {
+          "bloque": "camera.CameraType = Enum.CameraType.Scriptable",
+          "explicacion": "Pone la cámara en modo Scriptable: se desactiva el control del jugador (ratón/teclado) y solo el código puede moverla. Si no hacemos esto, el juego seguiría moviendo la cámara con el personaje y nuestro cambio se perdería."
+        },
+        {
+          "bloque": "camera.CFrame = parte.CFrame",
+          "explicacion": "Un CFrame guarda posición y orientación juntas. Al copiar el CFrame de la pieza, la cámara se coloca ahí y mira hacia donde mira esa pieza."
+        },
+        {
+          "bloque": "frame.Visible = false",
+          "explicacion": "Oculta el panel al elegir una cámara para que no tape la vista. Visible = false esconde el Frame y todo lo que contiene."
+        },
+        {
+          "bloque": "boton1.MouseButton1Click:Connect(function() ... end)",
+          "explicacion": "MouseButton1Click es un evento: se dispara cuando el jugador hace clic o toca el botón. Connect le dice «cuando pase esto, ejecuta esta función». Aquí llamamos irACamara(cam1). El botón 2 hace lo mismo con cam2."
+        }
+      ]
+    },
+    {
+      "numero": 7,
+      "titulo": "Script 2: openCloseButton (abrir y cerrar el panel)",
+      "objetivo": "Hacer que «Abrir» muestre u oculte el panel y que «X» lo cierre.",
+      "instrucciones": [
+        {
+          "haz_esto": "Dentro de Menu agrega otro LocalScript y nómbralo openCloseButton.",
+          "por_que": "Separamos responsabilidades: un script mueve la cámara y otro controla el panel. Es más fácil de entender y de arreglar."
+        },
+        {
+          "haz_esto": "Pega el código de abajo.",
+          "por_que": "Lee la explicación para ver qué hace cada parte."
+        }
+      ],
+      "codigo": "local Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\nlocal camera = workspace.CurrentCamera\n\nlocal menu = script.Parent\nlocal frame = menu:WaitForChild(\"Frame\")\nlocal botonX = frame:WaitForChild(\"X\")\nlocal botonAbrir = menu:WaitForChild(\"Abrir\")\n\nframe.Visible = false\n\nlocal function devolverCamara()\n\tlocal character = player.Character or player.CharacterAdded:Wait()\n\tlocal humanoid = character:WaitForChild(\"Humanoid\")\n\tcamera.CameraSubject = humanoid\n\tcamera.CameraType = Enum.CameraType.Custom\nend\n\nbotonAbrir.MouseButton1Click:Connect(function()\n\tframe.Visible = not frame.Visible\nend)\n\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\nend)",
+      "que_hace_este_codigo": [
+        {
+          "bloque": "local Players = game:GetService(\"Players\")  /  local player = Players.LocalPlayer",
+          "explicacion": "GetService obtiene el servicio que administra a los jugadores. LocalPlayer es el jugador que está usando este equipo; solo existe en LocalScripts."
+        },
+        {
+          "bloque": "local botonX = frame:WaitForChild(\"X\")  /  local botonAbrir = menu:WaitForChild(\"Abrir\")",
+          "explicacion": "Busca los dos botones. Observa que X se busca dentro de frame y Abrir dentro de menu, tal como los acomodamos en el Explorer."
+        },
+        {
+          "bloque": "frame.Visible = false",
+          "explicacion": "Al iniciar el juego, el panel arranca oculto. Solo se verá cuando el jugador presione «Abrir»."
+        },
+        {
+          "bloque": "frame.Visible = not frame.Visible",
+          "explicacion": "'not' invierte un valor verdadero/falso: si estaba visible lo oculta, y si estaba oculto lo muestra. Con una línea el mismo botón abre y cierra."
+        },
+        {
+          "bloque": "botonX.MouseButton1Click:Connect(...)",
+          "explicacion": "Al presionar X se pone Visible = false. Aquí no invertimos: siempre cerramos."
+        },
+        {
+          "bloque": "local function devolverCamara() ... end",
+          "explicacion": "Esta función todavía no se usa en este tutorial; la dejamos preparada para el reto final. Pone la cámara en modo Custom otra vez y la enfoca en el Humanoid del personaje, es decir, regresa al control normal del jugador. CharacterAdded:Wait() espera a que el personaje exista si aún no ha cargado."
+        }
+      ]
+    },
+    {
+      "numero": 8,
+      "titulo": "Probar el menú",
+      "objetivo": "Comprobar que todo funciona.",
+      "instrucciones": [
+        {
+          "haz_esto": "Presiona Play (F5).",
+          "por_que": "Los LocalScripts de StarterGui solo corren cuando el juego está en ejecución."
+        },
+        {
+          "haz_esto": "Haz clic en «Abrir»: debe aparecer el panel.",
+          "por_que": "Comprueba el script openCloseButton."
+        },
+        {
+          "haz_esto": "Haz clic en 1 y luego en 2: la cámara debe saltar a cada pieza.",
+          "por_que": "Comprueba el script changeCamera."
+        },
+        {
+          "haz_esto": "Abre el panel y presiona X: debe cerrarse.",
+          "por_que": "Comprueba el botón de cierre."
+        },
+        {
+          "haz_esto": "Si algo falla, abre View → Output y lee el mensaje de error.",
+          "por_que": "El Output te dice qué línea falló y por qué. Aprender a leerlo es una habilidad clave de programar."
+        }
+      ]
+    }
+  ],
+  "errores_comunes": [
+    {
+      "problema": "No pasa nada al hacer clic en los botones.",
+      "causa_posible": "Se usó un Script en lugar de un LocalScript, o el script no está dentro de Menu.",
+      "solucion": "Verifica que el icono sea de LocalScript y que sea hijo directo de Menu."
+    },
+    {
+      "problema": "En Output aparece «Infinite yield possible on ... WaitForChild(\"X\")».",
+      "causa_posible": "El nombre no coincide (mayúsculas, espacios) o el objeto está en otro lugar.",
+      "solucion": "Compara el nombre del Explorer con el del código letra por letra y revisa que esté en el padre correcto."
+    },
+    {
+      "problema": "La cámara no se mueve o vuelve a su lugar.",
+      "causa_posible": "No se puso CameraType en Scriptable, o Cam1/Cam2 no existen en Workspace.",
+      "solucion": "Revisa la línea camera.CameraType = Enum.CameraType.Scriptable y que las Parts estén directamente en Workspace."
+    },
+    {
+      "problema": "La cámara mira hacia otro lado.",
+      "causa_posible": "La pieza está rotada diferente a como esperabas.",
+      "solucion": "Rota la Part hasta que su cara frontal apunte a lo que quieres mostrar."
+    },
+    {
+      "problema": "El botón «Abrir» desaparece y no puedo reabrir el menú.",
+      "causa_posible": "«Abrir» quedó dentro del Frame.",
+      "solucion": "Arrástralo en el Explorer para que sea hijo de Menu, al mismo nivel que Frame."
+    },
+    {
+      "problema": "Los botones se encimen o no se pueden presionar.",
+      "causa_posible": "Tienen la misma Position o se tapan unos a otros.",
+      "solucion": "Cambia la Position de cada uno y revisa la propiedad ZIndex."
+    },
+    {
+      "problema": "Después de elegir una cámara no puedo volver a mover mi personaje con la cámara normal.",
+      "causa_posible": "Es lo esperado: la cámara quedó en Scriptable y nadie la devolvió a Custom.",
+      "solucion": "Usa la función devolverCamara() en el reto final."
+    },
+    {
+      "problema": "Al morir, el menú se reinicia.",
+      "causa_posible": "ResetOnSpawn del ScreenGui está activado.",
+      "solucion": "Desactiva ResetOnSpawn en las propiedades de Menu si no quieres ese comportamiento."
+    }
+  ],
+  "reto_extra": {
+    "titulo": "Reto: volver a la cámara normal",
+    "descripcion": "Ahora la cámara se queda en la última pieza elegida. Usa la función devolverCamara() que ya está en el script openCloseButton para regresar al personaje.",
+    "pista": "Llama a devolverCamara() desde algún botón: puede ser la X, o un tercer botón nuevo llamado «Volver».",
+    "codigo_ejemplo": "-- Reto: agrega un botón \"Volver\" (o usa la X) y llama a devolverCamara()\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\n\tdevolverCamara() -- regresa la cámara al jugador\nend)",
+    "otros_retos": [
+      "Agrega una tercera cámara (Cam3) y su botón.",
+      "Cambia el menú para que «Abrir» cambie su texto a «Cerrar» cuando el panel esté visible.",
+      "Haz que al elegir una cámara se muestre un nuevo Frame con un botón «Volver»."
+    ]
+  },
+  "idea_clave_logica_de_UIs": {
+    "mensaje": "Esta es una de las muchas formas de armar interfaces en Roblox. Lo importante no es memorizar este menú, sino entender la lógica que se repite en CUALQUIER UI.",
+    "logica_base": [
+      "1. Dibuja tu interfaz: ScreenGui → Frames → Botones, textos, imágenes.",
+      "2. Decide qué debe pasar cuando se presiona cada botón.",
+      "3. Conecta el botón con esa acción usando un evento (MouseButton1Click:Connect).",
+      "4. La acción casi siempre es cambiar una propiedad: Visible de otro UI, la cámara, un texto, un color, etc."
+    ],
+    "ejemplos_de_la_misma_logica": [
+      "Un botón «Tienda» que oculta el menú principal y muestra el Frame de la tienda.",
+      "Un botón «Jugar» que oculta el menú de inicio y mueve la cámara al mapa.",
+      "Un botón «Atrás» que oculta el Frame actual y muestra el anterior.",
+      "Un botón «Ajustes» que abre un panel con más botones."
+    ],
+    "pregunta_guia": "Cada vez que diseñes una UI, pregúntate: «¿Qué botón quiero que haga qué, y qué UI quiero que se muestre o se oculte al presionarlo?»"
+  },
+  "resumen_final": {
+    "lo_que_construimos": "Creamos un menú con un ScreenGui, un Frame y cuatro botones. Dos LocalScripts conectan esos botones con acciones: uno abre y cierra el panel cambiando Visible, y el otro cambia la cámara a Scriptable y la coloca en la posición de Cam1 o Cam2.",
+    "conceptos_clave": [
+      "ScreenGui: contenedor de toda la UI en pantalla.",
+      "Frame: agrupa elementos y se muestra u oculta como bloque.",
+      "TextButton / ImageButton: elementos que el jugador puede presionar.",
+      "LocalScript: código que corre en el equipo del jugador; ideal para UI y cámara.",
+      "WaitForChild: espera a que un objeto exista antes de usarlo.",
+      "MouseButton1Click:Connect(): ejecuta código cuando se presiona un botón.",
+      "Visible: propiedad que muestra u oculta un elemento de UI.",
+      "CameraType Scriptable: desactiva el control manual para que el código mueva la cámara.",
+      "CFrame: posición y orientación de un objeto en una sola propiedad."
+    ],
+    "mensaje_final": "No se trata de copiar código, sino de entender cómo se conectan las piezas. Con esta misma lógica puedes crear menús de tienda, inventarios, selectores de personaje y más. ¡Experimenta cambiando valores y viendo qué pasa!"
+  }
+}
