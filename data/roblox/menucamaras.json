@@ -229,14 +229,14 @@
           "por_que": "Lee la explicación para ver qué hace cada parte."
         }
       ],
-      "codigo": "local Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\nlocal camera = workspace.CurrentCamera\n\nlocal menu = script.Parent\nlocal frame = menu:WaitForChild(\"Frame\")\nlocal botonX = frame:WaitForChild(\"X\")\nlocal botonAbrir = menu:WaitForChild(\"Abrir\")\n\nframe.Visible = false\n\nlocal function devolverCamara()\n\tlocal character = player.Character or player.CharacterAdded:Wait()\n\tlocal humanoid = character:WaitForChild(\"Humanoid\")\n\tcamera.CameraSubject = humanoid\n\tcamera.CameraType = Enum.CameraType.Custom\nend\n\nbotonAbrir.MouseButton1Click:Connect(function()\n\tframe.Visible = not frame.Visible\nend)\n\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\nend)",
+      "codigo": "local menu = script.Parent\nlocal frame = menu:WaitForChild(\"Frame\")\nlocal botonX = frame:WaitForChild(\"X\")\nlocal botonAbrir = menu:WaitForChild(\"Abrir\")\n\nframe.Visible = false\n\nbotonAbrir.MouseButton1Click:Connect(function()\n\tframe.Visible = not frame.Visible\nend)\n\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\nend)",
       "que_hace_este_codigo": [
         {
-          "bloque": "local Players = game:GetService(\"Players\")  /  local player = Players.LocalPlayer",
-          "explicacion": "GetService obtiene el servicio que administra a los jugadores. LocalPlayer es el jugador que está usando este equipo; solo existe en LocalScripts."
+          "bloque": "local menu = script.Parent",
+          "explicacion": "script es este LocalScript y .Parent es su padre, el ScreenGui Menu. Desde ahí buscamos los demás objetos."
         },
         {
-          "bloque": "local botonX = frame:WaitForChild(\"X\")  /  local botonAbrir = menu:WaitForChild(\"Abrir\")",
+          "bloque": "frame:WaitForChild(\"X\")  /  menu:WaitForChild(\"Abrir\")",
           "explicacion": "Busca los dos botones. Observa que X se busca dentro de frame y Abrir dentro de menu, tal como los acomodamos en el Explorer."
         },
         {
@@ -244,16 +244,12 @@
           "explicacion": "Al iniciar el juego, el panel arranca oculto. Solo se verá cuando el jugador presione «Abrir»."
         },
         {
-          "bloque": "frame.Visible = not frame.Visible",
+          "bloque": "botonAbrir.MouseButton1Click:Connect(...)  →  frame.Visible = not frame.Visible",
           "explicacion": "'not' invierte un valor verdadero/falso: si estaba visible lo oculta, y si estaba oculto lo muestra. Con una línea el mismo botón abre y cierra."
         },
         {
           "bloque": "botonX.MouseButton1Click:Connect(...)",
           "explicacion": "Al presionar X se pone Visible = false. Aquí no invertimos: siempre cerramos."
-        },
-        {
-          "bloque": "local function devolverCamara() ... end",
-          "explicacion": "Esta función todavía no se usa en este tutorial; la dejamos preparada para el reto final. Pone la cámara en modo Custom otra vez y la enfoca en el Humanoid del personaje, es decir, regresa al control normal del jugador. CharacterAdded:Wait() espera a que el personaje exista si aún no ha cargado."
         }
       ]
     },
@@ -319,7 +315,7 @@
     {
       "problema": "Después de elegir una cámara no puedo volver a mover mi personaje con la cámara normal.",
       "causa_posible": "Es lo esperado: la cámara quedó en Scriptable y nadie la devolvió a Custom.",
-      "solucion": "Usa la función devolverCamara() en el reto final."
+      "solucion": "Haz el reto final: agrega la función devolverCamara() y llámala desde un botón."
     },
     {
       "problema": "Al morir, el menú se reinicia.",
@@ -329,14 +325,33 @@
   ],
   "reto_extra": {
     "titulo": "Reto: volver a la cámara normal",
-    "descripcion": "Ahora la cámara se queda en la última pieza elegida. Usa la función devolverCamara() que ya está en el script openCloseButton para regresar al personaje.",
-    "pista": "Llama a devolverCamara() desde algún botón: puede ser la X, o un tercer botón nuevo llamado «Volver».",
-    "codigo_ejemplo": "-- Reto: agrega un botón \"Volver\" (o usa la X) y llama a devolverCamara()\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\n\tdevolverCamara() -- regresa la cámara al jugador\nend)",
+    "descripcion": "Ahora la cámara se queda en la última pieza elegida, porque está en modo Scriptable y nadie la devuelve al jugador. Para arreglarlo hay que regresarla a Custom y enfocarla otra vez en el personaje.",
+    "pista": "Agrega esta función al script openCloseButton (arriba de los eventos) y llámala cuando se presione la X o un nuevo botón «Volver».",
+    "codigo_ejemplo": "local Players = game:GetService(\"Players\")\nlocal player = Players.LocalPlayer\nlocal camera = workspace.CurrentCamera\n\nlocal function devolverCamara()\n\tlocal character = player.Character or player.CharacterAdded:Wait()\n\tlocal humanoid = character:WaitForChild(\"Humanoid\")\n\tcamera.CameraSubject = humanoid\n\tcamera.CameraType = Enum.CameraType.Custom\nend\n\nbotonX.MouseButton1Click:Connect(function()\n\tframe.Visible = false\n\tdevolverCamara() -- regresa la cámara al jugador\nend)",
     "otros_retos": [
       "Agrega una tercera cámara (Cam3) y su botón.",
       "Cambia el menú para que «Abrir» cambie su texto a «Cerrar» cuando el panel esté visible.",
       "Haz que al elegir una cámara se muestre un nuevo Frame con un botón «Volver»."
-    ]
+    ],
+    "que_hace_este_codigo": [
+      {
+        "bloque": "game:GetService(\"Players\")  /  Players.LocalPlayer",
+        "explicacion": "GetService obtiene el servicio que administra a los jugadores. LocalPlayer es el jugador que usa este equipo; solo existe en LocalScripts."
+      },
+      {
+        "bloque": "player.Character or player.CharacterAdded:Wait()",
+        "explicacion": "Usa el personaje si ya existe; si no, espera a que aparezca."
+      },
+      {
+        "bloque": "camera.CameraSubject = humanoid",
+        "explicacion": "Le dice a la cámara a quién seguir: el Humanoid de tu personaje."
+      },
+      {
+        "bloque": "camera.CameraType = Enum.CameraType.Custom",
+        "explicacion": "Devuelve la cámara al modo normal, así el jugador vuelve a controlarla con ratón o teclado."
+      }
+    ],
+    "nota": "Si usas la X para volver, quita el devolverCamara() de la X cuando quieras que cerrar el panel NO regrese la cámara, y usa un botón «Volver» aparte."
   },
   "idea_clave_logica_de_UIs": {
     "mensaje": "Esta es una de las muchas formas de armar interfaces en Roblox. Lo importante no es memorizar este menú, sino entender la lógica que se repite en CUALQUIER UI.",
